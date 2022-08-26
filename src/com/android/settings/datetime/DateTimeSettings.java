@@ -20,6 +20,8 @@ import android.app.Dialog;
 import android.app.settings.SettingsEnums;
 import android.app.timedetector.TimeDetectorHelper;
 import android.content.Context;
+import android.os.Bundle;
+import android.text.format.DateFormat;
 
 import com.android.settings.R;
 import com.android.settings.dashboard.DashboardFragment;
@@ -28,14 +30,19 @@ import com.android.settingslib.search.SearchIndexable;
 
 import com.google.android.setupcompat.util.WizardManagerHelper;
 
+import com.android.settings.halcyon.preference.SystemSettingListPreference;
+
 @SearchIndexable
 public class DateTimeSettings extends DashboardFragment implements
         TimePreferenceController.TimePreferenceHost, DatePreferenceController.DatePreferenceHost {
 
     private static final String TAG = "DateTimeSettings";
+    private static final String STATUS_BAR_AM_PM = "status_bar_am_pm";
 
     // have we been launched from the setup wizard?
     protected static final String EXTRA_IS_FROM_SUW = "firstRun";
+
+    private SystemSettingListPreference mStatusBarAmPm;
 
     @Override
     public int getMetricsCategory() {
@@ -79,6 +86,19 @@ public class DateTimeSettings extends DashboardFragment implements
     @Override
     public void updateTimeAndDateDisplay(Context context) {
         updatePreferenceStates();
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        mStatusBarAmPm =
+                (SystemSettingListPreference) findPreference(STATUS_BAR_AM_PM);
+
+        if (DateFormat.is24HourFormat(getActivity())) {
+            mStatusBarAmPm.setEnabled(false);
+            mStatusBarAmPm.setSummary(R.string.status_bar_am_pm_info);
+        }
     }
 
     @Override
